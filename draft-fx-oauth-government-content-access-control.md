@@ -9,20 +9,20 @@ number:
 date:
 consensus: true
 v: 3
-area: Security
-workgroup: OAuth Working Group
+area: "Security"
+workgroup: "Web Authorization Protocol"
 keyword:
  - government
  - age restriction
  - content control
  - oauth2
 venue:
-  group: "OAuth Working Group"
+  group: "Web Authorization Protocol"
   type: "Working Group"
-  mail: standard@fxco.ca
-  arch: fxmorin.github.io/government-content-access-control/
-  github: FxMorin/government-content-access-control
-  latest: fxmorin.github.io/government-content-access-control/
+  mail: "oauth@ietf.org"
+  arch: "https://mailarchive.ietf.org/arch/browse/oauth/"
+  github: "FxMorin/government-content-access-control"
+  latest: "https://FxMorin.github.io/government-content-access-control/draft-fx-oauth-government-content-access-control.html"
 
 author:
  -
@@ -35,7 +35,7 @@ normative:
   RFC6749:
   RFC7636:
   RFC8705:
- 
+
 informative:
   RFC6819:
   RFC9101:
