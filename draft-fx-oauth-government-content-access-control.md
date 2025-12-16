@@ -70,7 +70,7 @@ The following additional terms are used:
   An OAuth client requesting eligibility decisions for regulated content.
 
 * **Scope**:  
-  A government-defined content access category (e.g., `pornography`, `social_media`, `gambling`, `alcohol`, `firearms`).
+  A government-defined content access category (e.g., `pornography`, `social_media`, `gambling`, `alcohol`, `firearms`, `vpn`, `proxy`).
 
 * **Person Key**:  
   A government-internal, pseudonymous identifier derived from a national identity record and never exposed outside the GCCA.
@@ -126,6 +126,8 @@ social_media
 gambling
 alcohol
 firearms
+vpn
+proxy
 ```
 
 Each scope:
