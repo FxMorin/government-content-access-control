@@ -10,18 +10,19 @@ date:
 consensus: true
 v: 3
 area: AREA
-workgroup: oauth
+workgroup: WG Working Group
 keyword:
  - government
  - age restriction
  - content control
+ - oauth2
 venue:
   group: fxco
   type: Working Group
   mail: standard@fxco.ca
-  arch: gcac.fxco.ca
+  arch: fxmorin.github.io/government-content-access-control/
   github: FxMorin/government-content-access-control
-  latest: gcac.fxco.ca/LATEST
+  latest: fxmorin.github.io/government-content-access-control/
 
 author:
  -
@@ -38,8 +39,6 @@ normative:
 informative:
  - RFC6819
  - RFC9101
-
-...
 
 --- abstract
 
@@ -236,3 +235,5 @@ This document has no IANA actions.
 {:numbered="false"}
 
 The author would like to acknowledge ongoing discussions within the OAuth and digital privacy communities that informed the design principles of this specification.
+
+---
