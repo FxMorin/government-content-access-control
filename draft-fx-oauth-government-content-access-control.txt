@@ -1,0 +1,315 @@
+
+
+
+
+OAuth Working Group                                             F. Morin
+Internet-Draft                                                 FXCO Ltd.
+Intended status: Informational                          16 December 2025
+Expires: 19 June 2026
+
+
+              OAuth 2.1 Government Content Access Control
+        draft-fx-oauth-government-content-access-control-latest
+
+Abstract
+
+   This document defines an OAuth 2.1 profile that enables a government
+   authority to enforce age-based and content-based access restrictions
+   for online services while preserving user privacy.  The protocol
+   allows relying parties to request government-defined regulatory
+   scopes (such as pornography or social media access) and receive
+   cryptographically verifiable eligibility decisions without disclosing
+   user identity, exact age, or personally identifiable information.
+   The profile constrains OAuth features to prevent abuse, cross-service
+   correlation, and unauthorized token issuance.
+
+About This Document
+
+   This note is to be removed before publishing as an RFC.
+
+   The latest revision of this draft can be found at fxmorin.github.io/
+   government-content-access-control/.  Status information for this
+   document may be found at https://datatracker.ietf.org/doc/draft-fx-
+   oauth-government-content-access-control/.
+
+   Discussion of this document takes place on the OAuth Working Group
+   Working Group mailing list (mailto:standard@fxco.ca), which is
+   archived at fxmorin.github.io/government-content-access-control/.
+
+   Source for this draft and an issue tracker can be found at
+   https://github.com/FxMorin/government-content-access-control.
+
+Status of This Memo
+
+   This Internet-Draft is submitted in full conformance with the
+   provisions of BCP 78 and BCP 79.
+
+   Internet-Drafts are working documents of the Internet Engineering
+   Task Force (IETF).  Note that other groups may also distribute
+   working documents as Internet-Drafts.  The list of current Internet-
+   Drafts is at https://datatracker.ietf.org/drafts/current/.
+
+   Internet-Drafts are draft documents valid for a maximum of six months
+   and may be updated, replaced, or obsoleted by other documents at any
+   time.  It is inappropriate to use Internet-Drafts as reference
+   material or to cite them other than as "work in progress."
+
+   This Internet-Draft will expire on 19 June 2026.
+
+Copyright Notice
+
+   Copyright (c) 2025 IETF Trust and the persons identified as the
+   document authors.  All rights reserved.
+
+   This document is subject to BCP 78 and the IETF Trust's Legal
+   Provisions Relating to IETF Documents (https://trustee.ietf.org/
+   license-info) in effect on the date of publication of this document.
+   Please review these documents carefully, as they describe your rights
+   and restrictions with respect to this document.  Code Components
+   extracted from this document must include Revised BSD License text as
+   described in Section 4.e of the Trust Legal Provisions and are
+   provided without warranty as described in the Revised BSD License.
+
+Table of Contents
+
+   1.  Introduction
+   2.  Conventions and Definitions
+   3.  Goals and Non-Goals
+     3.1.  Goals
+     3.2.  Non-Goals
+   4.  Architecture Overview
+   5.  Scope Model
+     5.1.  Government-Defined Scopes
+     5.2.  Scope Evaluation Semantics
+   6.  Client Registration
+   7.  Protocol Flow
+     7.1.  Authorization Request
+     7.2.  User Authentication and Evaluation
+     7.3.  Authorization Response
+     7.4.  Token Request and Response
+   8.  Token Derivation
+   9.  Re-Verification
+   10. Security Considerations
+   11. IANA Considerations
+   12. References
+     12.1.  Normative References
+     12.2.  Informative References
+   Acknowledgments
+   Author's Address
+
+1.  Introduction
+
+   Governments increasingly require online services to restrict access
+   to certain categories of content based on the age or legal status of
+   users.  Existing approaches frequently rely on disclosure of personal
+   data, third-party identity providers, or proprietary mechanisms that
+   enable tracking across services.
+
+   This document specifies *OAuth 2.1 Government Content Access Control
+   (GCAC)*, an OAuth 2.1 profile in which a government-operated
+   authorization server evaluates user eligibility for regulated content
+   categories and issues privacy-preserving attestations to relying
+   parties.  GCAC is designed to answer narrowly scoped regulatory
+   questions (e.g., whether a user may access a category of content)
+   while minimizing data disclosure and preventing correlation across
+   services.
+
+   GCAC is not an identity system and MUST NOT be used for
+   authentication, user login, or personalization.
+
+2.  Conventions and Definitions
+
+   The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+   "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+   "OPTIONAL" in this document are to be interpreted as described in
+   BCP 14 [RFC2119] [RFC8174] when, and only when, they appear in all
+   capitals, as shown here.
+
+   The following additional terms are used: - *Government Content
+   Control Authority (GCCA)*: - A government-operated OAuth
+   Authorization Server responsible for identity verification, age
+   evaluation, and policy enforcement. - *Relying Party (RP)*: - An
+   OAuth client requesting eligibility decisions for regulated content.
+   - *Scope*: - A government-defined content access category (e.g.,
+   pornography, social_media, gambling, alcohol, firearms, vpn, proxy).
+   - *Person Key*: - A government-internal, pseudonymous identifier
+   derived from a national identity record and never exposed outside the
+   GCCA. - *Site Token*: - An RP-scoped, non-reversible token
+   representing a government eligibility attestation.
+
+3.  Goals and Non-Goals
+
+3.1.  Goals
+
+   The goals of this specification are: - Enable government-enforced
+   content access controls - Support multiple regulatory scopes defined
+   by government policy - Prevent disclosure of identity, date of birth,
+   or exact age - Prevent cross-RP correlation of users - Leverage
+   existing OAuth 2.1 security mechanisms
+
+3.2.  Non-Goals
+
+   This specification explicitly does not attempt to: - Provide user
+   authentication or login - Expose personal attributes or identity
+   claims - Enable cross-service user identification - Replace digital
+   identity or credential systems
+
+4.  Architecture Overview
+
+   GCCA uses the OAuth 2.1 Authorization Code flow with mandatory
+   security extensions and additional semantic constraints.
+
+   User → Relying Party → Government Content Control Authority ↑ ↓ └────
+   OAuth 2.1 ───────┘
+
+   The GCCA operates as a constrained OAuth Authorization Server, and
+   the RP operates as a confidential OAuth client.
+
+5.  Scope Model
+
+5.1.  Government-Defined Scopes
+
+   Scopes represent legally regulated content categories.  Examples
+   include:
+
+   pornography social_media gambling alcohol firearms vpn proxy
+
+   Each scope: - MUST be defined and governed by the GCCA - MUST
+   correspond to a legal or regulatory access rule - MUST prevent scope
+   definitions or combinations thereof that would allow an RP to infer a
+   user’s exact age or approximate age range through multiple
+   eligibility queries.  Scopes MUST be coarse-grained and legally
+   motivated, and MUST NOT be parameterized by numeric age values.
+
+5.2.  Scope Evaluation Semantics
+
+   For each requested scope, the GCCA determines whether the user
+   satisfies the applicable legal requirement.  The RP receives only a
+   boolean eligibility result per scope.
+
+6.  Client Registration
+
+   Relying parties MUST register with the GCCA prior to using GCAC.
+
+   During registration, the RP MUST provide: - Legal entity
+   identification - Intended use and justification for requested scopes
+   - One or more redirect URIs - A client authentication method (mutual
+   TLS or private_key_jwt)
+
+   The GCCA MAY restrict which scopes an RP is authorized to request.
+
+7.  Protocol Flow
+
+7.1.  Authorization Request
+
+   The RP initiates an OAuth authorization request:
+
+   GET /authorize ?response_type=code &client_id=client_id
+   &redirect_uri=registered_uri &scope=pornography social_media
+   &state=random_nonce &code_challenge=pkce_value`
+
+   The GCCA MUST reject requests that include unregistered redirect URIs
+   or unauthorized scopes.
+
+7.2.  User Authentication and Evaluation
+
+   The GCCA authenticates the user using government-controlled
+   mechanisms and evaluates eligibility for each requested scope.
+
+7.3.  Authorization Response
+
+   Upon successful evaluation, the GCCA redirects the user back to the
+   RP with an authorization code.
+
+7.4.  Token Request and Response
+
+   The RP exchanges the authorization code at the token endpoint using
+   client authentication and PKCE.  The GCCA responds with a site-scoped
+   eligibility attestation:
+
+   json { "site_token": "opaque_string", "scope_results": {
+   "pornography": true, "social_media": false }, "expires_at":
+   "timestamp" }
+
+8.  Token Derivation
+
+   The GCCA MUST derive an internal person key as follows:
+
+   person_key = HMAC(master_secret_key, national_person_id)
+
+   The site token MUST be derived deterministically:
+
+   site_token = HMAC(person_key, client_id)
+
+   The person key and national identifiers MUST NOT be exposed outside
+   the GCCA.
+
+9.  Re-Verification
+
+   Relying parties MUST provide a user-accessible mechanism to re-
+   initiate the GCAC flow.  Re-verification MUST follow the same
+   protocol as the initial authorization.
+
+10.  Security Considerations
+
+   GCAC relies on OAuth 2.1 security best practices, including
+   authorization code flow, PKCE, redirect URI allowlists, and strong
+   client authentication.  Leaked client identifiers alone do not enable
+   token issuance.  Tokens are RP-scoped and non-transferable,
+   preventing cross-service correlation and replay attacks.
+
+11.  IANA Considerations
+
+   This document has no IANA actions.
+
+12.  References
+
+12.1.  Normative References
+
+   [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
+              Requirement Levels", BCP 14, RFC 2119,
+              DOI 10.17487/RFC2119, March 1997,
+              <https://www.rfc-editor.org/rfc/rfc2119>.
+
+   [RFC6749]  Hardt, D., Ed., "The OAuth 2.0 Authorization Framework",
+              RFC 6749, DOI 10.17487/RFC6749, October 2012,
+              <https://www.rfc-editor.org/rfc/rfc6749>.
+
+   [RFC7636]  Sakimura, N., Ed., Bradley, J., and N. Agarwal, "Proof Key
+              for Code Exchange by OAuth Public Clients", RFC 7636,
+              DOI 10.17487/RFC7636, September 2015,
+              <https://www.rfc-editor.org/rfc/rfc7636>.
+
+   [RFC8174]  Leiba, B., "Ambiguity of Uppercase vs Lowercase in RFC
+              2119 Key Words", BCP 14, RFC 8174, DOI 10.17487/RFC8174,
+              May 2017, <https://www.rfc-editor.org/rfc/rfc8174>.
+
+   [RFC8705]  Campbell, B., Bradley, J., Sakimura, N., and T.
+              Lodderstedt, "OAuth 2.0 Mutual-TLS Client Authentication
+              and Certificate-Bound Access Tokens", RFC 8705,
+              DOI 10.17487/RFC8705, February 2020,
+              <https://www.rfc-editor.org/rfc/rfc8705>.
+
+12.2.  Informative References
+
+   [RFC6819]  Lodderstedt, T., Ed., McGloin, M., and P. Hunt, "OAuth 2.0
+              Threat Model and Security Considerations", RFC 6819,
+              DOI 10.17487/RFC6819, January 2013,
+              <https://www.rfc-editor.org/rfc/rfc6819>.
+
+   [RFC9101]  Sakimura, N., Bradley, J., and M. Jones, "The OAuth 2.0
+              Authorization Framework: JWT-Secured Authorization Request
+              (JAR)", RFC 9101, DOI 10.17487/RFC9101, August 2021,
+              <https://www.rfc-editor.org/rfc/rfc9101>.
+
+Acknowledgments
+
+   The author would like to acknowledge ongoing discussions within the
+   OAuth and digital privacy communities that informed the design
+   principles of this specification.
+
+Author's Address
+
+   Francois-Xavier Morin
+   FXCO Ltd.
+   Email: fx@fxco.ca
