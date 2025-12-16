@@ -1,7 +1,7 @@
 ---
 title: "OAuth 2.1 Government Content Access Control"
 abbrev: "OAuth 2.1 GCAC"
-category: info
+category: std
 
 docname: draft-fx-oauth-government-content-access-control-latest
 submissiontype: IETF  # also: "independent", "editorial", "IAB", or "IRTF"
@@ -21,14 +21,12 @@ venue:
   type: "Working Group"
   mail: "oauth@ietf.org"
   arch: "https://mailarchive.ietf.org/arch/browse/oauth/"
-  github: "FxMorin/government-content-access-control"
-  latest: "https://FxMorin.github.io/government-content-access-control/draft-fx-oauth-government-content-access-control.html"
 
 author:
  -
-    fullname: Francois-Xavier Morin
-    organization: FXCO Ltd.
-    email: fx@fxco.ca
+    fullname: "Francois-Xavier Morin"
+    organization: "FXCO Ltd."
+    email: "fx@fxco.ca"
 
 normative:
   RFC2119:
@@ -39,6 +37,8 @@ normative:
 informative:
   RFC6819:
   RFC9101:
+
+...
 
 --- abstract
 
