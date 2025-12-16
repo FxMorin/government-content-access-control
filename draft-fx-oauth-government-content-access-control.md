@@ -9,16 +9,16 @@ number:
 date:
 consensus: true
 v: 3
-area: AREA
-workgroup: WG Working Group
+area: Security
+workgroup: OAuth Working Group
 keyword:
  - government
  - age restriction
  - content control
  - oauth2
 venue:
-  group: fxco
-  type: Working Group
+  group: "OAuth Working Group"
+  type: "Working Group"
   mail: standard@fxco.ca
   arch: fxmorin.github.io/government-content-access-control/
   github: FxMorin/government-content-access-control
@@ -31,14 +31,14 @@ author:
     email: fx@fxco.ca
 
 normative:
- - RFC2119
- - RFC6749
- - RFC7636
- - RFC8705
+  RFC2119:
+  RFC6749:
+  RFC7636:
+  RFC8705:
  
 informative:
- - RFC6819
- - RFC9101
+  RFC6819:
+  RFC9101:
 
 --- abstract
 
@@ -61,21 +61,16 @@ GCAC is not an identity system and MUST NOT be used for authentication, user log
 {::boilerplate bcp14-tagged}
 
 The following additional terms are used:
-
-* **Government Content Control Authority (GCCA)**:  
-  A government-operated OAuth Authorization Server responsible for identity verification, age evaluation, and policy enforcement.
-
-* **Relying Party (RP)**:  
-  An OAuth client requesting eligibility decisions for regulated content.
-
-* **Scope**:  
-  A government-defined content access category (e.g., `pornography`, `social_media`, `gambling`, `alcohol`, `firearms`, `vpn`, `proxy`).
-
-* **Person Key**:  
-  A government-internal, pseudonymous identifier derived from a national identity record and never exposed outside the GCCA.
-
-* **Site Token**:  
-  An RP-scoped, non-reversible token representing a government eligibility attestation.
+- **Government Content Control Authority (GCCA)**:
+  - A government-operated OAuth Authorization Server responsible for identity verification, age evaluation, and policy enforcement.
+- **Relying Party (RP)**:
+  - An OAuth client requesting eligibility decisions for regulated content.
+- **Scope**:
+  - A government-defined content access category (e.g., `pornography`, `social_media`, `gambling`, `alcohol`, `firearms`, `vpn`, `proxy`).
+- **Person Key**:
+  - A government-internal, pseudonymous identifier derived from a national identity record and never exposed outside the GCCA.
+- **Site Token**:
+  - An RP-scoped, non-reversible token representing a government eligibility attestation.
 
 
 # Goals and Non-Goals
@@ -83,21 +78,19 @@ The following additional terms are used:
 ## Goals
 
 The goals of this specification are:
-
-* Enable government-enforced content access controls
-* Support multiple regulatory scopes defined by government policy
-* Prevent disclosure of identity, date of birth, or exact age
-* Prevent cross-RP correlation of users
-* Leverage existing OAuth 2.1 security mechanisms
+- Enable government-enforced content access controls
+- Support multiple regulatory scopes defined by government policy
+- Prevent disclosure of identity, date of birth, or exact age
+- Prevent cross-RP correlation of users
+- Leverage existing OAuth 2.1 security mechanisms
 
 ## Non-Goals
 
 This specification explicitly does not attempt to:
-
-* Provide user authentication or login
-* Expose personal attributes or identity claims
-* Enable cross-service user identification
-* Replace digital identity or credential systems
+- Provide user authentication or login
+- Expose personal attributes or identity claims
+- Enable cross-service user identification
+- Replace digital identity or credential systems
 
 
 # Architecture Overview
@@ -130,10 +123,9 @@ proxy
 ```
 
 Each scope:
-
-* MUST be defined and governed by the GCCA
-* MUST correspond to a legal or regulatory access rule
-* MUST prevent scope definitions or combinations thereof that would allow an RP to infer a user’s exact age or approximate age range through multiple eligibility queries. Scopes MUST be coarse-grained and legally motivated, and MUST NOT be parameterized by numeric age values.
+- MUST be defined and governed by the GCCA
+- MUST correspond to a legal or regulatory access rule
+- MUST prevent scope definitions or combinations thereof that would allow an RP to infer a user’s exact age or approximate age range through multiple eligibility queries. Scopes MUST be coarse-grained and legally motivated, and MUST NOT be parameterized by numeric age values.
 
 ## Scope Evaluation Semantics
 
@@ -144,11 +136,10 @@ For each requested scope, the GCCA determines whether the user satisfies the app
 Relying parties MUST register with the GCCA prior to using GCAC.
 
 During registration, the RP MUST provide:
-
-* Legal entity identification
-* Intended use and justification for requested scopes
-* One or more redirect URIs
-* A client authentication method (mutual TLS or `private_key_jwt`)
+- Legal entity identification
+- Intended use and justification for requested scopes
+- One or more redirect URIs
+- A client authentication method (mutual TLS or `private_key_jwt`)
 
 The GCCA MAY restrict which scopes an RP is authorized to request.
 
@@ -160,7 +151,6 @@ The GCCA MAY restrict which scopes an RP is authorized to request.
 The RP initiates an OAuth authorization request:
 
 ```
-
 GET /authorize
 ?response_type=code
 &client_id=client_id
@@ -168,7 +158,6 @@ GET /authorize
 &scope=pornography social_media
 &state=random_nonce
 &code_challenge=pkce_value
-
 ````
 
 The GCCA MUST reject requests that include unregistered redirect URIs or unauthorized scopes.
@@ -194,7 +183,7 @@ The RP exchanges the authorization code at the token endpoint using client authe
   },
   "expires_at": "timestamp"
 }
-````
+```
 
 
 # Token Derivation
