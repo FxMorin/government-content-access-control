@@ -256,3 +256,4 @@ GCAC offers a **privacy-preserving, standardized, government-aligned, technicall
 [10]: https://www.reddit.com/r/australian/comments/1mcp9cv?utm_source=fxmorin.github.io/government-content-access-control/ "This is what’s happening in the UK after they implanted the age ban for social media"
 [11]: https://www.reddit.com/r/aussie/comments/1pkmn78/australian_kids_finding_ways_around_countrys_new/?utm_source=fxmorin.github.io/government-content-access-control/ "Australian kids finding ways around country’s new under-16 social media ban"
 [12]: https://www.infrastructure.gov.au/sites/default/files/documents/government-response-to-the-roadmap-for-age-verification-august2023.pdf?utm_source=fxmorin.github.io/government-content-access-control/ "Australian Government response to the Roadmap for Age Verification"
+ 
