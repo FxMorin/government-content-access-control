@@ -1,0 +1,81 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2025-12-18T00:05:33.607949+00:00",
+  "repo": "FxMorin/government-content-access-control",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [],
+  "pulls": [
+    {
+      "number": 1,
+      "id": "PR_kwDOQp7gHs65Pp_l",
+      "title": "Add reason markdown file",
+      "url": "https://github.com/FxMorin/government-content-access-control/pull/1",
+      "state": "CLOSED",
+      "author": "FxMorin",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2025-12-16T22:08:37Z",
+      "updatedAt": "2025-12-16T22:09:03Z",
+      "baseRepository": "FxMorin/government-content-access-control",
+      "baseRefName": "reason",
+      "baseRefOid": "e5927ef1b092d0e5b53d389b2d38379988442f48",
+      "headRepository": "FxMorin/government-content-access-control",
+      "headRefName": "reason-1",
+      "headRefOid": "39286ee83aaa7b7eed15b0838b0f2bfcfd87586d",
+      "closedAt": "2025-12-16T22:09:03Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": []
+    }
+  ]
+}
