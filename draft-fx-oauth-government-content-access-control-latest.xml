@@ -1,0 +1,519 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE rfc [
+        <!ENTITY nbsp    "&#160;">
+        <!ENTITY zwsp   "&#8203;">
+        <!ENTITY nbhy   "&#8209;">
+        <!ENTITY wj     "&#8288;">
+        ]>
+<rfc xmlns:xi="http://www.w3.org/2001/XInclude" submissionType="IETF" docName="draft-fx-oauth-government-content-access-control-02" category="info" ipr="trust200902" obsoletes="" updates="" xml:lang="en" symRefs="true" sortRefs="false" tocInclude="true" version="3">
+    <front>
+        <title abbrev="OAuth 2.1 Gov Content Access Control">OAuth 2.1 Government Content Access Control</title>
+        <seriesInfo name="Internet-Draft" value="draft-fx-oauth-government-content-access-control-02"/>
+        <author initials="F." surname="Morin" fullname="Francois-Xavier Morin">
+            <organization>FXCO Ltd.</organization>
+            <address>
+                <email>fx@fxco.ca</email>
+            </address>
+        </author>
+        <date year="2026" month="January" day="25"/>
+        <workgroup>OAuth Working Group</workgroup>
+        <keyword>OAuth</keyword>
+        <keyword>Government</keyword>
+        <keyword>child safety</keyword>
+        <keyword>age restriction</keyword>
+        <abstract>
+            <t>
+                This document defines an OAuth 2.1 profile that enables a government
+                authority to enforce age-based and content-based access restrictions
+                for online services while preserving user privacy. The protocol
+                allows relying parties to request government-defined regulatory
+                scopes (such as pornography or social media access) and receive
+                cryptographically verifiable eligibility decisions without disclosing
+                user identity, exact age, or personally identifiable information.
+                The profile constrains OAuth features to prevent abuse, cross-service
+                correlation, and unauthorized token issuance.
+            </t>
+        </abstract>
+        <note>
+            <name>About This Document</name>
+            <t>This note is to be removed before publishing as an RFC.</t>
+            <t>
+                The latest revision of this draft can be found at
+                <eref target="https://fxmorin.github.io/government-content-access-control"/>.
+                Status information for this document may be found at
+                <eref target="https://datatracker.ietf.org/doc/draft-fx-oauth-government-content-access-control/"/>.
+            </t>
+            <t>
+                Discussion of this document takes place on the Web Authorization Protocol Working Group
+                mailing list (mailto:oauth@ietf.org), which is archived at
+                <eref target="https://mailarchive.ietf.org/arch/browse/oauth/"/>.
+                Subscribe at <eref target="https://www.ietf.org/mailman/listinfo/oauth/"/>.
+            </t>
+            <t>
+                Source for this draft and an issue tracker can be found at
+                <eref target="https://github.com/FxMorin/government-content-access-control"/>
+            </t>
+        </note>
+    </front>
+    <middle>
+        <section anchor="sect-1" numbered="true" toc="default">
+            <name>Introduction</name>
+            <t>
+                Governments increasingly require online services to restrict access
+                to certain categories of content based on the age or legal status of
+                users. Existing approaches frequently rely on disclosure of personal
+                data, third-party identity providers, or proprietary mechanisms that
+                enable tracking across services.
+            </t>
+            <t>
+                This document specifies OAuth 2.1 Government Content Access Control
+                (GCAC), an OAuth 2.1 <xref target="I-D.ietf-oauth-v2-1" format="default"/> profile in which a
+                government-operated authorization server evaluates user eligibility for regulated content
+                categories and issues privacy-preserving attestations to relying
+                parties. GCAC is designed to answer narrowly scoped regulatory
+                questions (e.g., whether a user may access a category of content)
+                while minimizing data disclosure and preventing correlation across
+                services.
+            </t>
+            <t>
+                GCAC is not an identity system and MUST NOT be used for
+                authentication, user login, or personalization.
+            </t>
+        </section>
+        <section anchor="sect-2" numbered="true" toc="default">
+            <name>Conventions and Definitions</name>
+            <t>
+                The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+                "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and
+                "OPTIONAL" in this document are to be interpreted as described in
+                BCP 14 <xref target="RFC2119" format="default"/> <xref target="RFC8174" format="default"/> when,
+                and only when, they appear in all capitals, as shown here.</t>
+            <t>The following additional terms are used:</t>
+            <ul spacing="normal">
+                <li>
+                    <t>Government Content Control Authority (GCCA):</t>
+                    <ul spacing="normal">
+                        <li>
+                            <t>
+                                A government-operated OAuth Authorization Server responsible for identity
+                                verification, age evaluation, and policy enforcement.
+                            </t>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <t>Relying Party (RP):</t>
+                    <ul spacing="normal">
+                        <li>
+                            <t>An OAuth client requesting eligibility decisions for regulated content.</t>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <t>Scope:</t>
+                    <ul spacing="normal">
+                        <li>
+                            <t>
+                                A government-defined content access category (e.g.,
+                                <tt>pornography</tt>, <tt>social_media</tt>, <tt>gambling</tt>, <tt>alcohol</tt>,
+                                <tt>firearms</tt>, <tt>vpn</tt>, <tt>proxy</tt>).
+                            </t>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <t>Person Key:</t>
+                    <ul spacing="normal">
+                        <li>
+                            <t>A government-internal, pseudonymous identifier derived from a national identity
+                                record and never exposed outside the GCCA.</t>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <t>Site Token:</t>
+                    <ul spacing="normal">
+                        <li>
+                            <t>
+                                An RP-scoped, non-reversible token representing a government
+                                eligibility attestation.
+                            </t>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </section>
+        <section anchor="sect-3" numbered="true" toc="default">
+            <name>Goals and Non-Goals</name>
+            <section anchor="sect-3.1" numbered="true" toc="default">
+                <name>Goals</name>
+                <t>The goals of this specification are:</t>
+                <ul spacing="normal">
+                    <li>
+                        <t>Enable government-enforced content access controls</t>
+                    </li>
+                    <li>
+                        <t>Support multiple regulatory scopes defined by government policy</t>
+                    </li>
+                    <li>
+                        <t>Prevent disclosure of identity, date of birth, or exact age</t>
+                    </li>
+                    <li>
+                        <t>Prevent cross-RP correlation of users</t>
+                    </li>
+                    <li>
+                        <t>Leverage existing OAuth 2.1 security mechanisms</t>
+                    </li>
+                </ul>
+            </section>
+            <section anchor="sect-3.2" numbered="true" toc="default">
+                <name>Non-Goals</name>
+                <t>This specification explicitly does not attempt to:</t>
+                <ul spacing="normal">
+                    <li>
+                        <t>Provide user authentication or login services to RPs</t>
+                    </li>
+                    <li>
+                        <t>Expose personal attributes or identity claims (e.g., OIDC claims)</t>
+                    </li>
+                    <li>
+                        <t>Enable cross-service user identification</t>
+                    </li>
+                    <li>
+                        <t>Replace digital identity or credential systems</t>
+                    </li>
+                </ul>
+            </section>
+        </section>
+        <section anchor="sect-4" numbered="true" toc="default">
+            <name>Architecture Overview</name>
+            <t><xref target="fig-code-flow"/>
+                GCCA uses the OAuth 2.1 Authorization Code flow with mandatory security
+                extensions and additional semantic constraints.
+            </t>
+            <figure anchor="fig-code-flow">
+                <name>GCCA Code Flow</name>
+                <artwork type="ascii-art"><![CDATA[
+    User → Relying Party → Government Content Control Authority
+    ↑                      ↓
+    └──── OAuth 2.1 ───────┘
+]]></artwork>
+            </figure>
+            <t>
+                The GCCA operates as a constrained OAuth Authorization Server, and
+                the RP operates as a confidential OAuth client.
+            </t>
+        </section>
+        <section anchor="sect-5" numbered="true" toc="default">
+            <name>Scope Model</name>
+            <section anchor="sect-5.1" numbered="true" toc="default">
+                <name>Government-Defined Scopes</name>
+                <t>Scopes represent legally regulated content categories. Examples include:</t>
+                <ul spacing="normal">
+                    <li>
+                        <t><tt>pornography</tt></t>
+                    </li>
+                    <li>
+                        <t><tt>social_media</tt></t>
+                    </li>
+                    <li>
+                        <t><tt>gambling</tt></t>
+                    </li>
+                    <li>
+                        <t><tt>alcohol</tt></t>
+                    </li>
+                    <li>
+                        <t><tt>firearms</tt></t>
+                    </li>
+                    <li>
+                        <t><tt>vpn</tt></t>
+                    </li>
+                    <li>
+                        <t><tt>proxy</tt></t>
+                    </li>
+                </ul>
+                <t>Each scope:</t>
+                <ul spacing="normal">
+                    <li>
+                        <t>MUST be defined and governed by the GCCA</t>
+                    </li>
+                    <li>
+                        <t>MUST correspond to a legal or regulatory access rule</t>
+                    </li>
+                    <li>
+                        <t>
+                            MUST prevent scope definitions or combinations thereof that would allow an
+                            RP to infer a user’s exact age or approximate age range through multiple
+                            eligibility queries.  Scopes MUST be coarse-grained and legally motivated,
+                            and MUST NOT be parameterized by numeric age values.
+                        </t>
+                    </li>
+                </ul>
+            </section>
+            <section anchor="sect-5.2" numbered="true" toc="default">
+                <name>Scope Evaluation Semantics</name>
+                <t>
+                    For each requested scope, the GCCA determines whether the user
+                    satisfies the applicable legal requirement. The RP receives only a
+                    boolean eligibility result per scope.
+                </t>
+            </section>
+        </section>
+        <section anchor="sect-6" numbered="true" toc="default">
+            <name>Client Registration</name>
+            <t>Relying parties MUST register with the GCCA prior to using GCAC.</t>
+            <t>During registration, the RP MUST provide:</t>
+            <ul spacing="normal">
+                <li>
+                    <t>Legal entity identification</t>
+                </li>
+                <li>
+                    <t>Intended use and justification for requested scopes</t>
+                </li>
+                <li>
+                    <t>One or more redirect URIs</t>
+                </li>
+                <li>
+                    <t>A client authentication method (mutual TLS <xref target="RFC8705" format="default"/> or <tt>private_key_jwt</tt>)</t>
+                </li>
+            </ul>
+            <t>The GCCA MAY restrict which scopes an RP is authorized to request.</t>
+        </section>
+        <section anchor="sect-7" numbered="true" toc="default">
+            <name>Protocol Flow</name>
+            <section anchor="sect-7.1" numbered="true" toc="default">
+                <name>Authorization Request</name>
+                <t><xref target="fig-gcca-request"/> The RP initiates an OAuth authorization request:</t>
+                <figure anchor="fig-gcca-request">
+                    <name>Example: GCCA request</name>
+                    <sourcecode type="http-message"><![CDATA[
+GET /authorize
+?response_type=code
+&client_id=client_id
+&redirect_uri=registered_uri
+&scope=pornography+social_media
+&state=random_nonce
+&code_challenge=pkce_value
+]]></sourcecode>
+                </figure>
+                <t>
+                    The GCCA MUST reject requests that include unregistered redirect URIs
+                    or unauthorized scopes.
+                </t>
+            </section>
+            <section anchor="sect-7.2" numbered="true" toc="default">
+                <name>User Authentication and Evaluation</name>
+                <t>
+                    The GCCA authenticates the user using government-controlled
+                    mechanisms and evaluates eligibility for each requested scope.
+                </t>
+            </section>
+            <section anchor="sect-7.3" numbered="true" toc="default">
+                <name>Authorization Response</name>
+                <t>
+                    Upon successful evaluation, the GCCA redirects the user back to the
+                    RP with an authorization code.
+                </t>
+            </section>
+            <section anchor="sect-7.4" numbered="true" toc="default">
+                <name>Token Request and Response</name>
+                <t>
+                    The RP exchanges the authorization code at the token endpoint using
+                    client authentication and PKCE <xref target="RFC7636" format="default"/>.
+                </t>
+                <t>
+                    <xref target="fig-gcca-response"/> The GCCA responds with a site-scoped eligibility
+                    attestation as a standard OAuth 2.1 token response, including additional custom parameters:
+                </t>
+                <figure anchor="fig-gcca-response">
+                    <name>Example: GCCA Response</name>
+                    <sourcecode type="http-message"><![CDATA[
+HTTP/1.1 200 OK
+Content-Type: application/json
+Cache-Control: no-store
+
+{
+  "access_token": "opaque_site_token_string",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "scope_results": {
+    "pornography": true,
+    "social_media": false
+  }
+}
+]]></sourcecode>
+                </figure>
+                <t>
+                    The "access_token" field contains the site token, which is an RP-scoped,
+                    non-reversible eligibility attestation.
+                </t>
+            </section>
+        </section>
+        <section anchor="sect-8" numbered="true" toc="default">
+            <name>Token Derivation</name>
+            <t>
+                <xref target="fig-person-key-pseudo"/> The GCCA MUST derive an internal person key
+                using HMAC-SHA256 with a globally unique master secret key (<tt>master_secret_key</tt>)
+                and a stable, unique national identifier for the person (<tt>national_person_id</tt>):
+            </t>
+            <figure anchor="fig-person-key-pseudo">
+                <name>Person Key Pseudocode</name>
+                <sourcecode type="pseudocode"><![CDATA[
+person_key = HMAC_SHA256(master_secret_key, national_person_id)
+]]></sourcecode>
+            </figure>
+            <t>
+                <xref target="fig-site-token-pseudo"/> The site token MUST be derived deterministically
+                using HMAC-SHA256 from the person key (<tt>person_key</tt>)
+                and the client identifier (<tt>client_id</tt>):
+            </t>
+            <figure anchor="fig-site-token-pseudo">
+                <name>Site Token Pseudocode</name>
+                <sourcecode type="pseudocode"><![CDATA[
+site_token = HMAC_SHA256(person_key, client_id)
+]]></sourcecode>
+            </figure>
+            <t>The person key and national identifiers MUST NOT be exposed outside the GCCA.</t>
+        </section>
+        <section anchor="sect-9" numbered="true" toc="default">
+            <name>Re-Verification</name>
+            <t>
+                Relying parties MUST provide a user-accessible mechanism to re-
+                initiate the GCAC flow. Re-verification MUST follow the same
+                protocol as the initial authorization.
+            </t>
+        </section>
+        <section anchor="sect-10" numbered="true" toc="default">
+            <name>Security Considerations</name>
+            <t>
+                GCAC relies on OAuth 2.1 security best practices, including
+                authorization code flow, PKCE <xref target="RFC7636" format="default"/>, redirect URI allowlists, and strong
+                client authentication. General security considerations for OAuth 2.0
+                <xref target="RFC6819" format="default"/> also apply.
+                To further protect the integrity and confidentiality of authorization
+                requests, RPs SHOULD use JWT-Secured Authorization Request (JAR)
+                <xref target="RFC9101" format="default"/>.
+                Leaked client identifiers alone do not enable
+                token issuance. Tokens are RP-scoped and non-transferable,
+                preventing cross-service correlation and replay attacks.
+            </t>
+        </section>
+        <section anchor="sect-11" numbered="true" toc="default">
+            <name>IANA Considerations</name>
+            <t>This document has no IANA actions.</t>
+        </section>
+    </middle>
+    <back>
+        <references>
+            <name>References</name>
+            <references>
+                <name>Normative References</name>
+                <reference anchor="I-D.ietf-oauth-v2-1" target="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1">
+                    <front>
+                        <title>The OAuth 2.1 Authorization Framework</title>
+                        <author fullname="D. Hardt" initials="D." surname="Hardt"/>
+                        <author fullname="A. Parecki" initials="A." surname="Parecki"/>
+                        <author fullname="T. Lodderstedt" initials="T." surname="Lodderstedt"/>
+                        <date day="20" month="January" year="2025"/>
+                    </front>
+                    <seriesInfo name="Internet-Draft" value="draft-ietf-oauth-v2-1-11"/>
+                </reference>
+                <reference anchor="RFC2119" target="https://www.rfc-editor.org/info/rfc2119">
+                    <front>
+                        <title>Key words for use in RFCs to Indicate Requirement Levels</title>
+                        <author fullname="S. Bradner" initials="S." surname="Bradner"/>
+                        <date month="March" year="1997"/>
+                        <abstract>
+                            <t>In many standards track documents several words are used to signify the requirements in the specification. These words are often capitalized. This document defines these words as they should be interpreted in IETF documents. This document specifies an Internet Best Current Practices for the Internet Community, and requests discussion and suggestions for improvements.</t>
+                        </abstract>
+                    </front>
+                    <seriesInfo name="BCP" value="14"/>
+                    <seriesInfo name="RFC" value="2119"/>
+                    <seriesInfo name="DOI" value="10.17487/RFC2119"/>
+                </reference>
+                <reference anchor="RFC7636" target="https://www.rfc-editor.org/info/rfc7636">
+                    <front>
+                        <title>Proof Key for Code Exchange by OAuth Public Clients</title>
+                        <author fullname="N. Sakimura" initials="N." role="editor" surname="Sakimura"/>
+                        <author fullname="J. Bradley" initials="J." surname="Bradley"/>
+                        <author fullname="N. Agarwal" initials="N." surname="Agarwal"/>
+                        <date month="September" year="2015"/>
+                        <abstract>
+                            <t>OAuth 2.0 public clients utilizing the Authorization Code Grant are susceptible to the authorization code interception attack. This specification describes the attack as well as a technique to mitigate against the threat through the use of Proof Key for Code Exchange (PKCE, pronounced "pixy").</t>
+                        </abstract>
+                    </front>
+                    <seriesInfo name="RFC" value="7636"/>
+                    <seriesInfo name="DOI" value="10.17487/RFC7636"/>
+                </reference>
+                <reference anchor="RFC8174" target="https://www.rfc-editor.org/info/rfc8174">
+                    <front>
+                        <title>Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words</title>
+                        <author fullname="B. Leiba" initials="B." surname="Leiba"/>
+                        <date month="May" year="2017"/>
+                        <abstract>
+                            <t>RFC 2119 specifies common key words that may be used in protocol specifications. This document aims to reduce the ambiguity by clarifying that only UPPERCASE usage of the key words have the defined special meanings.</t>
+                        </abstract>
+                    </front>
+                    <seriesInfo name="BCP" value="14"/>
+                    <seriesInfo name="RFC" value="8174"/>
+                    <seriesInfo name="DOI" value="10.17487/RFC8174"/>
+                </reference>
+                <reference anchor="RFC8705" target="https://www.rfc-editor.org/info/rfc8705">
+                    <front>
+                        <title>OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens</title>
+                        <author fullname="B. Campbell" initials="B." surname="Campbell"/>
+                        <author fullname="J. Bradley" initials="J." surname="Bradley"/>
+                        <author fullname="N. Sakimura" initials="N." surname="Sakimura"/>
+                        <author fullname="T. Lodderstedt" initials="T." surname="Lodderstedt"/>
+                        <date month="February" year="2020"/>
+                        <abstract>
+                            <t>This document describes OAuth client authentication and certificate-bound access and refresh tokens using mutual Transport Layer Security (TLS) authentication with X.509 certificates. OAuth clients are provided a mechanism for authentication to the authorization server using mutual TLS, based on either self-signed certificates or public key infrastructure (PKI). OAuth authorization servers are provided a mechanism for binding access tokens to a client's mutual-TLS certificate, and OAuth protected resources are provided a method for ensuring that such an access token presented to it was issued to the client presenting the token.</t>
+                        </abstract>
+                    </front>
+                    <seriesInfo name="RFC" value="8705"/>
+                    <seriesInfo name="DOI" value="10.17487/RFC8705"/>
+                </reference>
+            </references>
+            <references>
+                <name>Informative References</name>
+                <reference anchor="RFC6819" target="https://www.rfc-editor.org/info/rfc6819">
+                    <front>
+                        <title>OAuth 2.0 Threat Model and Security Considerations</title>
+                        <author fullname="T. Lodderstedt" initials="T." role="editor" surname="Lodderstedt"/>
+                        <author fullname="M. McGloin" initials="M." surname="McGloin"/>
+                        <author fullname="P. Hunt" initials="P." surname="Hunt"/>
+                        <date month="January" year="2013"/>
+                        <abstract>
+                            <t>This document gives additional security considerations for OAuth, beyond those in the OAuth 2.0 specification, based on a comprehensive threat model for the OAuth 2.0 protocol. This document is not an Internet Standards Track specification; it is published for informational purposes.</t>
+                        </abstract>
+                    </front>
+                    <seriesInfo name="RFC" value="6819"/>
+                    <seriesInfo name="DOI" value="10.17487/RFC6819"/>
+                </reference>
+                <reference anchor="RFC9101" target="https://www.rfc-editor.org/info/rfc9101">
+                    <front>
+                        <title>The OAuth 2.0 Authorization Framework: JWT-Secured Authorization Request (JAR)</title>
+                        <author fullname="N. Sakimura" initials="N." surname="Sakimura"/>
+                        <author fullname="J. Bradley" initials="J." surname="Bradley"/>
+                        <author fullname="M. Jones" initials="M." surname="Jones"/>
+                        <date month="August" year="2021"/>
+                        <abstract>
+                            <t>The authorization request in OAuth 2.0 described in RFC 6749 utilizes query parameter serialization, which means that authorization request parameters are encoded in the URI of the request and sent through user agents such as web browsers. While it is easy to implement, it means that a) the communication through the user agents is not integrity protected and thus, the parameters can be tainted, b) the source of the communication is not authenticated, and c) the communication through the user agents can be monitored. Because of these weaknesses, several attacks to the protocol have now been put forward.</t>
+                            <t>This document introduces the ability to send request parameters in a JSON Web Token (JWT) instead, which allows the request to be signed with JSON Web Signature (JWS) and encrypted with JSON Web Encryption (JWE) so that the integrity, source authentication, and confidentiality properties of the authorization request are attained. The request can be sent by value or by reference.</t>
+                        </abstract>
+                    </front>
+                    <seriesInfo name="RFC" value="9101"/>
+                    <seriesInfo name="DOI" value="10.17487/RFC9101"/>
+                </reference>
+            </references>
+        </references>
+        <section numbered="false" anchor="acknowledgments" toc="default">
+            <name>Acknowledgments</name>
+            <t>
+                The author would like to acknowledge ongoing discussions within the
+                OAuth and digital privacy communities that informed the design
+                principles of this specification.
+            </t>
+        </section>
+    </back>
+</rfc>
