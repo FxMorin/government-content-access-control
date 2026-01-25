@@ -6,7 +6,6 @@
 *.upload
 *~
 .tags
-/*-[0-9][0-9].xml
 /.*.mk
 /.gems/
 /.idea/
@@ -18,7 +17,6 @@
 /versioned/
 Gemfile.lock
 archive.json
-draft-fx-oauth-government-content-access-control.xml
 package-lock.json
 report.xml
 !requirements.txt
