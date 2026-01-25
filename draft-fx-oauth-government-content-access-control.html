@@ -2,18 +2,28 @@
 <html lang="en" class="Internet-Draft">
 <head>
 <meta charset="utf-8">
-<meta content="Common,Latin" name="scripts">
+<meta content="Common" name="scripts">
 <meta content="initial-scale=1.0" name="viewport">
 <title>OAuth 2.1 Government Content Access Control</title>
 <meta content="Francois-Xavier Morin" name="author">
 <meta content="
-       This document defines an OAuth 2.1 profile that enables a government authority to enforce age-based and content-based access restrictions for online services while preserving user privacy. The protocol allows relying parties to request government-defined regulatory scopes (such as pornography or social media access) and receive cryptographically verifiable eligibility decisions without disclosing user identity, exact age, or personally identifiable information. The profile constrains OAuth features to prevent abuse, cross-service correlation, and unauthorized token issuance. 
+       
+                This document defines an OAuth 2.1 profile that enables a government
+                authority to enforce age-based and content-based access restrictions
+                for online services while preserving user privacy. The protocol
+                allows relying parties to request government-defined regulatory
+                scopes (such as pornography or social media access) and receive
+                cryptographically verifiable eligibility decisions without disclosing
+                user identity, exact age, or personally identifiable information.
+                The profile constrains OAuth features to prevent abuse, cross-service
+                correlation, and unauthorized token issuance.
+       
     " name="description">
 <meta content="xml2rfc 3.31.0" name="generator">
-<meta content="government" name="keyword">
+<meta content="OAuth" name="keyword">
+<meta content="Government" name="keyword">
+<meta content="child safety" name="keyword">
 <meta content="age restriction" name="keyword">
-<meta content="content control" name="keyword">
-<meta content="oauth2" name="keyword">
 <meta content="draft-fx-oauth-government-content-access-control-latest" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.31.0
@@ -27,7 +37,7 @@
     pycountry 24.6.1
     PyYAML 6.0.3
     requests 2.32.5
-    wcwidth 0.2.14
+    wcwidth 0.3.0
 -->
 <link href="draft-fx-oauth-government-content-access-control.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
@@ -568,6 +578,7 @@ aside, blockquote {
 }
 blockquote {
   margin: 1em 0;
+  border-left: 2px var(--pilcrow-strong) solid;
 }
 cite {
   display: block;
@@ -638,7 +649,7 @@ a.pilcrow {
   }
 }
 @media not print {
-  :hover > a.pilcrow {
+  :hover > a.pilcrow, a.pilcrow:focus {
     opacity: 1;
   }
   a.pilcrow[href]:hover {
@@ -1045,12 +1056,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <table class="ears">
 <thead><tr>
 <td class="left">Internet-Draft</td>
-<td class="center">OAuth 2.1 GCAC</td>
+<td class="center">OAuth 2.1 Gov Content Access Control</td>
 <td class="right">January 2026</td>
 </tr></thead>
 <tfoot><tr>
 <td class="left">Morin</td>
-<td class="center">Expires 20 July 2026</td>
+<td class="center">Expires 29 July 2026</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1058,17 +1069,17 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <div id="internal-metadata" class="document-information">
 <dl id="identifiers">
 <dt class="label-workgroup">Workgroup:</dt>
-<dd class="workgroup">Web Authorization Protocol</dd>
+<dd class="workgroup">OAuth Working Group</dd>
 <dt class="label-internet-draft">Internet-Draft:</dt>
 <dd class="internet-draft">draft-fx-oauth-government-content-access-control-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2026-01-16" class="published">16 January 2026</time>
+<time datetime="2026-01-25" class="published">25 January 2026</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
-<dd class="intended-status">Standards Track</dd>
+<dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2026-07-20">20 July 2026</time></dd>
+<dd class="expires"><time datetime="2026-07-29">29 July 2026</time></dd>
 <dt class="label-authors">Author:</dt>
 <dd class="authors">
 <div class="author">
@@ -1081,20 +1092,47 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <h1 id="title">OAuth 2.1 Government Content Access Control</h1>
 <section id="section-abstract">
       <h2 id="abstract"><a href="#abstract" class="selfRef">Abstract</a></h2>
-<p id="section-abstract-1">This document defines an OAuth 2.1 profile that enables a government authority to enforce age-based and content-based access restrictions for online services while preserving user privacy. The protocol allows relying parties to request government-defined regulatory scopes (such as pornography or social media access) and receive cryptographically verifiable eligibility decisions without disclosing user identity, exact age, or personally identifiable information. The profile constrains OAuth features to prevent abuse, cross-service correlation, and unauthorized token issuance.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
+<p id="section-abstract-1">
+                This document defines an OAuth 2.1 profile that enables a government
+                authority to enforce age-based and content-based access restrictions
+                for online services while preserving user privacy. The protocol
+                allows relying parties to request government-defined regulatory
+                scopes (such as pornography or social media access) and receive
+                cryptographically verifiable eligibility decisions without disclosing
+                user identity, exact age, or personally identifiable information.
+                The profile constrains OAuth features to prevent abuse, cross-service
+                correlation, and unauthorized token issuance.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </section>
-<section class="note rfcEditorRemove" id="section-note.1">
-      <h2 id="name-about-this-document">
-<a href="#name-about-this-document" class="section-name selfRef">About This Document</a>
+<section class="note" id="section-note.1">
+      <h2 id="name-foreword">
+<a href="#name-foreword" class="section-name selfRef">Foreword</a>
       </h2>
 <p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
 <p id="section-note.1-2">
-        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-fx-oauth-government-content-access-control/">https://datatracker.ietf.org/doc/draft-fx-oauth-government-content-access-control/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+                The latest revision of this draft can be found at <span><a href="https://fxmorin.github.io/government-content-access-control">https://fxmorin.github.io/government-content-access-control</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
 <p id="section-note.1-3">
-        Discussion of this document takes place on the
-        Web Authorization Protocol Working Group mailing list (<span><a href="mailto:oauth@ietf.org">mailto:oauth@ietf.org</a></span>),
-        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/oauth/">https://mailarchive.ietf.org/arch/browse/oauth/</a></span>.
-        Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/oauth/">https://www.ietf.org/mailman/listinfo/oauth/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+                Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-fx-oauth-government-content-access-control/">https://datatracker.ietf.org/doc/draft-fx-oauth-government-content-access-control/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+<p id="section-note.1-4">
+                Discussion of this document takes place on the Web Authorization Protocol Working Group
+                mailing list (mailto:oauth@ietf.org), which is archived at
+                <span><a href="https://mailarchive.ietf.org/arch/browse/oauth/">https://mailarchive.ietf.org/arch/browse/oauth/</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
+<p id="section-note.1-5">
+                Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/oauth/">https://www.ietf.org/mailman/listinfo/oauth/</a></span>.<a href="#section-note.1-5" class="pilcrow">¶</a></p>
+<p id="section-note.1-6">
+                Source for this draft and an issue tracker can be found at
+                <span><a href="https://github.com/FxMorin/government-content-access-control">https://github.com/FxMorin/government-content-access-control</a></span><a href="#section-note.1-6" class="pilcrow">¶</a></p>
+</section>
+<section class="note" id="section-note.2">
+      <h2 id="name-requirements-language">
+<a href="#name-requirements-language" class="section-name selfRef">Requirements Language</a>
+      </h2>
+<p id="section-note.2-1">
+                The key words "MUST", "MUST NOT",
+                "REQUIRED", "SHALL", "SHALL NOT",
+                "SHOULD", "SHOULD NOT", "RECOMMENDED",
+                "MAY", and "OPTIONAL" in this document are to be
+                interpreted as described in <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span>
+                &amp; <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span>.<a href="#section-note.2-1" class="pilcrow">¶</a></p>
 </section>
 <div id="status-of-memo">
 <section id="section-boilerplate.1">
@@ -1115,7 +1153,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 20 July 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 29 July 2026.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1148,7 +1186,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
             <p id="section-toc.1-1.1.1" class="keepWithNext"><a href="#section-1" class="auto internal xref">1</a>.  <a href="#name-introduction" class="internal xref">Introduction</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.2">
-            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-conventions-and-definitions" class="internal xref">Conventions and Definitions</a></p>
+            <p id="section-toc.1-1.2.1" class="keepWithNext"><a href="#section-2" class="auto internal xref">2</a>.  <a href="#name-definitions" class="internal xref">Definitions</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.3">
             <p id="section-toc.1-1.3.1"><a href="#section-3" class="auto internal xref">3</a>.  <a href="#name-goals-and-non-goals" class="internal xref">Goals and Non-Goals</a></p>
@@ -1228,226 +1266,420 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </nav>
 </section>
 </div>
-<div id="introduction">
+<div id="sect-1">
 <section id="section-1">
       <h2 id="name-introduction">
 <a href="#section-1" class="section-number selfRef">1. </a><a href="#name-introduction" class="section-name selfRef">Introduction</a>
       </h2>
-<p id="section-1-1">Governments increasingly require online services to restrict access to certain categories of content based on the age or legal status of users. Existing approaches frequently rely on disclosure of personal data, third-party identity providers, or proprietary mechanisms that enable tracking across services.<a href="#section-1-1" class="pilcrow">¶</a></p>
-<p id="section-1-2">This document specifies <strong>OAuth 2.1 Government Content Access Control (GCAC)</strong>, an OAuth 2.1 profile in which a government-operated authorization server evaluates user eligibility for regulated content categories and issues privacy-preserving attestations to relying parties. GCAC is designed to answer narrowly scoped regulatory questions (e.g., whether a user may access a category of content) while minimizing data disclosure and preventing correlation across services.<a href="#section-1-2" class="pilcrow">¶</a></p>
-<p id="section-1-3">GCAC is not an identity system and <span class="bcp14">MUST NOT</span> be used for authentication, user login, or personalization.<a href="#section-1-3" class="pilcrow">¶</a></p>
+<p id="section-1-1">
+                Governments increasingly require online services to restrict access
+                to certain categories of content based on the age or legal status of
+                users. Existing approaches frequently rely on disclosure of personal
+                data, third-party identity providers, or proprietary mechanisms that
+                enable tracking across services.<a href="#section-1-1" class="pilcrow">¶</a></p>
+<p id="section-1-2">
+                This document specifies OAuth 2.1 Government Content Access Control
+                (GCAC), an OAuth 2.1 <span>[<a href="#I-D.ietf-oauth-v2-1" class="cite xref">I-D.ietf-oauth-v2-1</a>]</span> profile in which a
+                government-operated authorization server evaluates user eligibility for regulated content
+                categories and issues privacy-preserving attestations to relying
+                parties. GCAC is designed to answer narrowly scoped regulatory
+                questions (e.g., whether a user may access a category of content)
+                while minimizing data disclosure and preventing correlation across
+                services.<a href="#section-1-2" class="pilcrow">¶</a></p>
+<p id="section-1-3">
+                GCAC is not an identity system and MUST NOT be used for
+                authentication, user login, or personalization.<a href="#section-1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="conventions-and-definitions">
+<div id="sect-2">
 <section id="section-2">
-      <h2 id="name-conventions-and-definitions">
-<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-conventions-and-definitions" class="section-name selfRef">Conventions and Definitions</a>
+      <h2 id="name-definitions">
+<a href="#section-2" class="section-number selfRef">2. </a><a href="#name-definitions" class="section-name selfRef">Definitions</a>
       </h2>
-<p id="section-2-1">The key words "<span class="bcp14">MUST</span>", "<span class="bcp14">MUST NOT</span>", "<span class="bcp14">REQUIRED</span>", "<span class="bcp14">SHALL</span>", "<span class="bcp14">SHALL NOT</span>", "<span class="bcp14">SHOULD</span>", "<span class="bcp14">SHOULD NOT</span>", "<span class="bcp14">RECOMMENDED</span>", "<span class="bcp14">NOT RECOMMENDED</span>",
-"<span class="bcp14">MAY</span>", and "<span class="bcp14">OPTIONAL</span>" in this document are to be interpreted as
-described in BCP 14 <span>[<a href="#RFC2119" class="cite xref">RFC2119</a>]</span> <span>[<a href="#RFC8174" class="cite xref">RFC8174</a>]</span> when, and only when, they
-appear in all capitals, as shown here.<a href="#section-2-1" class="pilcrow">¶</a></p>
-<p id="section-2-2">The following additional terms are used:
-- <strong>Government Content Control Authority (GCCA)</strong>:
-  - A government-operated OAuth Authorization Server responsible for identity verification, age evaluation, and policy enforcement.
-- <strong>Relying Party (RP)</strong>:
-  - An OAuth client requesting eligibility decisions for regulated content.
-- <strong>Scope</strong>:
-  - A government-defined content access category (e.g., <code>pornography</code>, <code>social_media</code>, <code>gambling</code>, <code>alcohol</code>, <code>firearms</code>, <code>vpn</code>, <code>proxy</code>).
-- <strong>Person Key</strong>:
-  - A government-internal, pseudonymous identifier derived from a national identity record and never exposed outside the GCCA.
-- <strong>Site Token</strong>:
-  - An RP-scoped, non-reversible token representing a government eligibility attestation.<a href="#section-2-2" class="pilcrow">¶</a></p>
+<p id="section-2-1">The following terms are used:<a href="#section-2-1" class="pilcrow">¶</a></p>
+<ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="section-2-2.1">
+          <p id="section-2-2.1.1">Government Content Control Authority (GCCA):<a href="#section-2-2.1.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-2-2.1.2.1">
+              <p id="section-2-2.1.2.1.1">
+                            A government-operated OAuth Authorization Server responsible for identity
+                            verification, age evaluation, and policy enforcement.<a href="#section-2-2.1.2.1.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+</li>
+        <li class="normal ulEmpty" id="section-2-2.2">
+          <p id="section-2-2.2.1">Relying Party (RP):<a href="#section-2-2.2.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-2-2.2.2.1">
+              <p id="section-2-2.2.2.1.1">An OAuth client requesting eligibility decisions for regulated content.<a href="#section-2-2.2.2.1.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+</li>
+        <li class="normal ulEmpty" id="section-2-2.3">
+          <p id="section-2-2.3.1">Scope:<a href="#section-2-2.3.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-2-2.3.2.1">
+              <p id="section-2-2.3.2.1.1">
+                            A government-defined content access category (e.g.,
+                            <code>pornography</code>, <code>social_media</code>, <code>gambling</code>, <code>alcohol</code>,
+                            <code>firearms</code>, <code>vpn</code>, <code>proxy</code>).<a href="#section-2-2.3.2.1.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+</li>
+        <li class="normal ulEmpty" id="section-2-2.4">
+          <p id="section-2-2.4.1">Person Key:<a href="#section-2-2.4.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-2-2.4.2.1">
+              <p id="section-2-2.4.2.1.1">
+                            A government-internal, pseudonymous identifier derived from a national identity
+                            record and never exposed outside the GCCA.<a href="#section-2-2.4.2.1.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+</li>
+        <li class="normal ulEmpty" id="section-2-2.5">
+          <p id="section-2-2.5.1">Site Token:<a href="#section-2-2.5.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-2-2.5.2.1">
+              <p id="section-2-2.5.2.1.1">
+                            An RP-scoped, non-reversible token representing a government
+                            eligibility attestation.<a href="#section-2-2.5.2.1.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+</li>
+      </ul>
 </section>
 </div>
-<div id="goals-and-non-goals">
+<div id="sect-3">
 <section id="section-3">
       <h2 id="name-goals-and-non-goals">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-goals-and-non-goals" class="section-name selfRef">Goals and Non-Goals</a>
       </h2>
-<div id="goals">
+<div id="sect-3.1">
 <section id="section-3.1">
         <h3 id="name-goals">
 <a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-goals" class="section-name selfRef">Goals</a>
         </h3>
-<p id="section-3.1-1">The goals of this specification are:
-- Enable government-enforced content access controls
-- Support multiple regulatory scopes defined by government policy
-- Prevent disclosure of identity, date of birth, or exact age
-- Prevent cross-RP correlation of users
-- Leverage existing OAuth 2.1 security mechanisms<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<p id="section-3.1-1">The goals of this specification are:<a href="#section-3.1-1" class="pilcrow">¶</a></p>
+<ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="section-3.1-2.1">
+            <p id="section-3.1-2.1.1">Enable government-enforced content access controls<a href="#section-3.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal ulEmpty" id="section-3.1-2.2">
+            <p id="section-3.1-2.2.1">Support multiple regulatory scopes defined by government policy<a href="#section-3.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal ulEmpty" id="section-3.1-2.3">
+            <p id="section-3.1-2.3.1">Prevent disclosure of identity, date of birth, or exact age<a href="#section-3.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal ulEmpty" id="section-3.1-2.4">
+            <p id="section-3.1-2.4.1">Prevent cross-RP correlation of users<a href="#section-3.1-2.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal ulEmpty" id="section-3.1-2.5">
+            <p id="section-3.1-2.5.1">Leverage existing OAuth 2.1 security mechanisms<a href="#section-3.1-2.5.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
 </section>
 </div>
-<div id="non-goals">
+<div id="sect-3.2">
 <section id="section-3.2">
         <h3 id="name-non-goals">
 <a href="#section-3.2" class="section-number selfRef">3.2. </a><a href="#name-non-goals" class="section-name selfRef">Non-Goals</a>
         </h3>
-<p id="section-3.2-1">This specification explicitly does not attempt to:
-- Provide user authentication or login
-- Expose personal attributes or identity claims
-- Enable cross-service user identification
-- Replace digital identity or credential systems<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<p id="section-3.2-1">This specification explicitly does not attempt to:<a href="#section-3.2-1" class="pilcrow">¶</a></p>
+<ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="section-3.2-2.1">
+            <p id="section-3.2-2.1.1">Provide user authentication or login services to RPs<a href="#section-3.2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal ulEmpty" id="section-3.2-2.2">
+            <p id="section-3.2-2.2.1">Expose personal attributes or identity claims (e.g., OIDC claims)<a href="#section-3.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal ulEmpty" id="section-3.2-2.3">
+            <p id="section-3.2-2.3.1">Enable cross-service user identification<a href="#section-3.2-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal ulEmpty" id="section-3.2-2.4">
+            <p id="section-3.2-2.4.1">Replace digital identity or credential systems<a href="#section-3.2-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
 </section>
 </div>
 </section>
 </div>
-<div id="architecture-overview">
+<div id="sect-4">
 <section id="section-4">
       <h2 id="name-architecture-overview">
 <a href="#section-4" class="section-number selfRef">4. </a><a href="#name-architecture-overview" class="section-name selfRef">Architecture Overview</a>
       </h2>
-<p id="section-4-1">GCCA uses the OAuth 2.1 Authorization Code flow with mandatory security extensions and additional semantic constraints.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<p id="section-4-2"><code>
-User → Relying Party → Government Content Control Authority
-↑                     ↓
-└──── OAuth 2.1 ───────┘
-</code><a href="#section-4-2" class="pilcrow">¶</a></p>
-<p id="section-4-3">The GCCA operates as a constrained OAuth Authorization Server, and the RP operates as a confidential OAuth client.<a href="#section-4-3" class="pilcrow">¶</a></p>
+<p id="section-4-1">
+                GCCA uses the OAuth 2.1 Authorization Code flow with mandatory security
+                extensions and additional semantic constraints.<a href="#section-4-1" class="pilcrow">¶</a></p>
+<span id="name-gcca-code-flow"></span><div id="fig-code-flow">
+<figure id="figure-1">
+        <div class="alignLeft art-ascii-art art-text artwork" id="section-4-2.1">
+<pre>
+    User → Relying Party → Government Content Control Authority
+    ↑                      ↓
+    └──── OAuth 2.1 ───────┘
+</pre>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-gcca-code-flow" class="selfRef">GCCA Code Flow</a>
+        </figcaption></figure>
+</div>
+<p id="section-4-3">
+                The GCCA operates as a constrained OAuth Authorization Server, and
+                the RP operates as a confidential OAuth client.<a href="#section-4-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="scope-model">
+<div id="sect-5">
 <section id="section-5">
       <h2 id="name-scope-model">
 <a href="#section-5" class="section-number selfRef">5. </a><a href="#name-scope-model" class="section-name selfRef">Scope Model</a>
       </h2>
-<div id="government-defined-scopes">
+<div id="sect-5.1">
 <section id="section-5.1">
         <h3 id="name-government-defined-scopes">
 <a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-government-defined-scopes" class="section-name selfRef">Government-Defined Scopes</a>
         </h3>
 <p id="section-5.1-1">Scopes represent legally regulated content categories. Examples include:<a href="#section-5.1-1" class="pilcrow">¶</a></p>
-<p id="section-5.1-2"><code>
-pornography
-social_media
-gambling
-alcohol
-firearms
-vpn
-proxy
-</code><a href="#section-5.1-2" class="pilcrow">¶</a></p>
-<p id="section-5.1-3">Each scope:
-- <span class="bcp14">MUST</span> be defined and governed by the GCCA
-- <span class="bcp14">MUST</span> correspond to a legal or regulatory access rule
-- <span class="bcp14">MUST</span> prevent scope definitions or combinations thereof that would allow an RP to infer a user’s exact age or approximate age range through multiple eligibility queries. Scopes <span class="bcp14">MUST</span> be coarse-grained and legally motivated, and <span class="bcp14">MUST NOT</span> be parameterized by numeric age values.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+<ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="section-5.1-2.1">
+            <p id="section-5.1-2.1.1"><code>pornography</code><a href="#section-5.1-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal ulEmpty" id="section-5.1-2.2">
+            <p id="section-5.1-2.2.1"><code>social_media</code><a href="#section-5.1-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal ulEmpty" id="section-5.1-2.3">
+            <p id="section-5.1-2.3.1"><code>gambling</code><a href="#section-5.1-2.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal ulEmpty" id="section-5.1-2.4">
+            <p id="section-5.1-2.4.1"><code>alcohol</code><a href="#section-5.1-2.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal ulEmpty" id="section-5.1-2.5">
+            <p id="section-5.1-2.5.1"><code>firearms</code><a href="#section-5.1-2.5.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal ulEmpty" id="section-5.1-2.6">
+            <p id="section-5.1-2.6.1"><code>vpn</code><a href="#section-5.1-2.6.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal ulEmpty" id="section-5.1-2.7">
+            <p id="section-5.1-2.7.1"><code>proxy</code><a href="#section-5.1-2.7.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-5.1-3">Each scope:<a href="#section-5.1-3" class="pilcrow">¶</a></p>
+<ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="section-5.1-4.1">
+            <p id="section-5.1-4.1.1">MUST be defined and governed by the GCCA<a href="#section-5.1-4.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal ulEmpty" id="section-5.1-4.2">
+            <p id="section-5.1-4.2.1">MUST correspond to a legal or regulatory access rule<a href="#section-5.1-4.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal ulEmpty" id="section-5.1-4.3">
+            <p id="section-5.1-4.3.1">
+                            MUST prevent scope definitions or combinations thereof that would allow an
+                            RP to infer a user’s exact age or approximate age range through multiple
+                            eligibility queries.  Scopes MUST be coarse-grained and legally motivated,
+                            and MUST NOT be parameterized by numeric age values.<a href="#section-5.1-4.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
 </section>
 </div>
-<div id="scope-evaluation-semantics">
+<div id="sect-5.2">
 <section id="section-5.2">
         <h3 id="name-scope-evaluation-semantics">
 <a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-scope-evaluation-semantics" class="section-name selfRef">Scope Evaluation Semantics</a>
         </h3>
-<p id="section-5.2-1">For each requested scope, the GCCA determines whether the user satisfies the applicable legal requirement. The RP receives only a boolean eligibility result per scope.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
+<p id="section-5.2-1">
+                    For each requested scope, the GCCA determines whether the user
+                    satisfies the applicable legal requirement. The RP receives only a
+                    boolean eligibility result per scope.<a href="#section-5.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
-<div id="client-registration">
+<div id="sect-6">
 <section id="section-6">
       <h2 id="name-client-registration">
 <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-client-registration" class="section-name selfRef">Client Registration</a>
       </h2>
-<p id="section-6-1">Relying parties <span class="bcp14">MUST</span> register with the GCCA prior to using GCAC.<a href="#section-6-1" class="pilcrow">¶</a></p>
-<p id="section-6-2">During registration, the RP <span class="bcp14">MUST</span> provide:
-- Legal entity identification
-- Intended use and justification for requested scopes
-- One or more redirect URIs
-- A client authentication method (mutual TLS or <code>private_key_jwt</code>)<a href="#section-6-2" class="pilcrow">¶</a></p>
-<p id="section-6-3">The GCCA <span class="bcp14">MAY</span> restrict which scopes an RP is authorized to request.<a href="#section-6-3" class="pilcrow">¶</a></p>
+<p id="section-6-1">Relying parties MUST register with the GCCA prior to using GCAC.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">During registration, the RP MUST provide:<a href="#section-6-2" class="pilcrow">¶</a></p>
+<ul class="normal ulEmpty">
+<li class="normal ulEmpty" id="section-6-3.1">
+          <p id="section-6-3.1.1">Legal entity identification<a href="#section-6-3.1.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal ulEmpty" id="section-6-3.2">
+          <p id="section-6-3.2.1">Intended use and justification for requested scopes<a href="#section-6-3.2.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal ulEmpty" id="section-6-3.3">
+          <p id="section-6-3.3.1">One or more redirect URIs<a href="#section-6-3.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal ulEmpty" id="section-6-3.4">
+          <p id="section-6-3.4.1">A client authentication method (mutual TLS <span>[<a href="#RFC8705" class="cite xref">RFC8705</a>]</span> or <code>private_key_jwt</code>)<a href="#section-6-3.4.1" class="pilcrow">¶</a></p>
+</li>
+      </ul>
+<p id="section-6-4">The GCCA MAY restrict which scopes an RP is authorized to request.<a href="#section-6-4" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="protocol-flow">
+<div id="sect-7">
 <section id="section-7">
       <h2 id="name-protocol-flow">
 <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-protocol-flow" class="section-name selfRef">Protocol Flow</a>
       </h2>
-<div id="authorization-request">
+<div id="sect-7.1">
 <section id="section-7.1">
         <h3 id="name-authorization-request">
 <a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-authorization-request" class="section-name selfRef">Authorization Request</a>
         </h3>
 <p id="section-7.1-1">The RP initiates an OAuth authorization request:<a href="#section-7.1-1" class="pilcrow">¶</a></p>
-<p id="section-7.1-2"><code>
+<span id="name-example-gcca-request"></span><div id="fig-gcca-request">
+<figure id="figure-2">
+          <div class="lang-http-message sourcecode" id="section-7.1-2.1">
+<pre>
 GET /authorize
 ?response_type=code
 &amp;client_id=client_id
 &amp;redirect_uri=registered_uri
-&amp;scope=pornography social_media
+&amp;scope=pornography+social_media
 &amp;state=random_nonce
 &amp;code_challenge=pkce_value
-</code>`<a href="#section-7.1-2" class="pilcrow">¶</a></p>
-<p id="section-7.1-3">The GCCA <span class="bcp14">MUST</span> reject requests that include unregistered redirect URIs or unauthorized scopes.<a href="#section-7.1-3" class="pilcrow">¶</a></p>
+</pre>
+</div>
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<a href="#name-example-gcca-request" class="selfRef">Example: GCCA request</a>
+          </figcaption></figure>
+</div>
+<p id="section-7.1-3">
+                    The GCCA MUST reject requests that include unregistered redirect URIs
+                    or unauthorized scopes.<a href="#section-7.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="user-authentication-and-evaluation">
+<div id="sect-7.2">
 <section id="section-7.2">
         <h3 id="name-user-authentication-and-eva">
 <a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-user-authentication-and-eva" class="section-name selfRef">User Authentication and Evaluation</a>
         </h3>
-<p id="section-7.2-1">The GCCA authenticates the user using government-controlled mechanisms and evaluates eligibility for each requested scope.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+<p id="section-7.2-1">
+                    The GCCA authenticates the user using government-controlled
+                    mechanisms and evaluates eligibility for each requested scope.<a href="#section-7.2-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="authorization-response">
+<div id="sect-7.3">
 <section id="section-7.3">
         <h3 id="name-authorization-response">
 <a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-authorization-response" class="section-name selfRef">Authorization Response</a>
         </h3>
-<p id="section-7.3-1">Upon successful evaluation, the GCCA redirects the user back to the RP with an authorization code.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
+<p id="section-7.3-1">
+                    Upon successful evaluation, the GCCA redirects the user back to the
+                    RP with an authorization code.<a href="#section-7.3-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="token-request-and-response">
+<div id="sect-7.4">
 <section id="section-7.4">
         <h3 id="name-token-request-and-response">
 <a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-token-request-and-response" class="section-name selfRef">Token Request and Response</a>
         </h3>
-<p id="section-7.4-1">The RP exchanges the authorization code at the token endpoint using client authentication and PKCE. The GCCA responds with a site-scoped eligibility attestation:<a href="#section-7.4-1" class="pilcrow">¶</a></p>
-<p id="section-7.4-2"><code>json
+<p id="section-7.4-1">
+                    The RP exchanges the authorization code at the token endpoint using
+                    client authentication and PKCE <span>[<a href="#RFC7636" class="cite xref">RFC7636</a>]</span>.<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+<p id="section-7.4-2">
+                    The GCCA responds with a site-scoped eligibility attestation as a standard OAuth 2.1
+                    token response, including additional custom parameters:<a href="#section-7.4-2" class="pilcrow">¶</a></p>
+<span id="name-example-gcca-response"></span><div id="fig-gcca-response">
+<figure id="figure-3">
+          <div class="lang-http-message sourcecode" id="section-7.4-3.1">
+<pre>
+HTTP/1.1 200 OK
+Content-Type: application/json
+Cache-Control: no-store
+
 {
-  "site_token": "opaque_string",
+  "access_token": "opaque_site_token_string",
+  "token_type": "Bearer",
+  "expires_in": 3600,
   "scope_results": {
     "pornography": true,
     "social_media": false
-  },
-  "expires_at": "timestamp"
+  }
 }
-</code><a href="#section-7.4-2" class="pilcrow">¶</a></p>
+</pre>
+</div>
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
+<a href="#name-example-gcca-response" class="selfRef">Example: GCCA Response</a>
+          </figcaption></figure>
+</div>
+<p id="section-7.4-4">
+                    The "access_token" field contains the site token, which is an RP-scoped,
+                    non-reversible eligibility attestation.<a href="#section-7.4-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
-<div id="token-derivation">
+<div id="sect-8">
 <section id="section-8">
       <h2 id="name-token-derivation">
 <a href="#section-8" class="section-number selfRef">8. </a><a href="#name-token-derivation" class="section-name selfRef">Token Derivation</a>
       </h2>
-<p id="section-8-1">The GCCA <span class="bcp14">MUST</span> derive an internal person key as follows:<a href="#section-8-1" class="pilcrow">¶</a></p>
-<p id="section-8-2"><code>
-person_key = HMAC(master_secret_key, national_person_id)
-</code><a href="#section-8-2" class="pilcrow">¶</a></p>
-<p id="section-8-3">The site token <span class="bcp14">MUST</span> be derived deterministically:<a href="#section-8-3" class="pilcrow">¶</a></p>
-<p id="section-8-4"><code>
-site_token = HMAC(person_key, client_id)
-</code><a href="#section-8-4" class="pilcrow">¶</a></p>
-<p id="section-8-5">The person key and national identifiers <span class="bcp14">MUST NOT</span> be exposed outside the GCCA.<a href="#section-8-5" class="pilcrow">¶</a></p>
+<p id="section-8-1">
+                The GCCA MUST derive an internal person key using HMAC-SHA256 with a globally unique
+                master secret key (<code>master_secret_key</code>) and a stable, unique national identifier for
+                the person (<code>national_person_id</code>):<a href="#section-8-1" class="pilcrow">¶</a></p>
+<span id="name-person-key-pseudocode"></span><div id="fig-person-key-pseudo">
+<figure id="figure-4">
+        <div class="lang-pseudocode sourcecode" id="section-8-2.1">
+<pre>
+person_key = HMAC_SHA256(master_secret_key, national_person_id)
+</pre>
+</div>
+<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
+<a href="#name-person-key-pseudocode" class="selfRef">Person Key Pseudocode</a>
+        </figcaption></figure>
+</div>
+<p id="section-8-3">
+                The site token MUST be derived deterministically using HMAC-SHA256 from the
+                person key (<code>person_key</code>) and the client identifier (<code>client_id</code>):<a href="#section-8-3" class="pilcrow">¶</a></p>
+<span id="name-site-token-pseudocode"></span><div id="fig-site-token-pseudo">
+<figure id="figure-5">
+        <div class="lang-pseudocode sourcecode" id="section-8-4.1">
+<pre>
+site_token = HMAC_SHA256(person_key, client_id)
+</pre>
+</div>
+<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
+<a href="#name-site-token-pseudocode" class="selfRef">Site Token Pseudocode</a>
+        </figcaption></figure>
+</div>
+<p id="section-8-5">The person key and national identifiers MUST NOT be exposed outside the GCCA.<a href="#section-8-5" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="re-verification">
+<div id="sect-9">
 <section id="section-9">
       <h2 id="name-re-verification">
 <a href="#section-9" class="section-number selfRef">9. </a><a href="#name-re-verification" class="section-name selfRef">Re-Verification</a>
       </h2>
-<p id="section-9-1">Relying parties <span class="bcp14">MUST</span> provide a user-accessible mechanism to re-initiate the GCAC flow. Re-verification <span class="bcp14">MUST</span> follow the same protocol as the initial authorization.<a href="#section-9-1" class="pilcrow">¶</a></p>
+<p id="section-9-1">
+                Relying parties MUST provide a user-accessible mechanism to re-
+                initiate the GCAC flow. Re-verification MUST follow the same
+                protocol as the initial authorization.<a href="#section-9-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="security-considerations">
+<div id="sect-10">
 <section id="section-10">
       <h2 id="name-security-considerations">
 <a href="#section-10" class="section-number selfRef">10. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
-<p id="section-10-1">GCAC relies on OAuth 2.1 security best practices, including authorization code flow, PKCE, redirect URI allowlists, and strong client authentication. Leaked client identifiers alone do not enable token issuance. Tokens are RP-scoped and non-transferable, preventing cross-service correlation and replay attacks.<a href="#section-10-1" class="pilcrow">¶</a></p>
+<p id="section-10-1">
+                GCAC relies on OAuth 2.1 security best practices, including
+                authorization code flow, PKCE <span>[<a href="#RFC7636" class="cite xref">RFC7636</a>]</span>, redirect URI allowlists, and strong
+                client authentication. General security considerations for OAuth 2.0
+                <span>[<a href="#RFC6819" class="cite xref">RFC6819</a>]</span> also apply.
+                To further protect the integrity and confidentiality of authorization
+                requests, RPs SHOULD use JWT-Secured Authorization Request (JAR)
+                <span>[<a href="#RFC9101" class="cite xref">RFC9101</a>]</span>.
+                Leaked client identifiers alone do not enable
+                token issuance. Tokens are RP-scoped and non-transferable,
+                preventing cross-service correlation and replay attacks.<a href="#section-10-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="iana-considerations">
+<div id="sect-11">
 <section id="section-11">
       <h2 id="name-iana-considerations">
 <a href="#section-11" class="section-number selfRef">11. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
@@ -1455,41 +1687,37 @@ site_token = HMAC(person_key, client_id)
 <p id="section-11-1">This document has no IANA actions.<a href="#section-11-1" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="sec-combined-references">
 <section id="section-12">
       <h2 id="name-references">
 <a href="#section-12" class="section-number selfRef">12. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
-<div id="sec-normative-references">
 <section id="section-12.1">
         <h3 id="name-normative-references">
 <a href="#section-12.1" class="section-number selfRef">12.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
+<dt id="I-D.ietf-oauth-v2-1">[I-D.ietf-oauth-v2-1]</dt>
+        <dd>
+<span class="refAuthor">Hardt, D.</span>, <span class="refAuthor">Parecki, A.</span>, and <span class="refAuthor">T. Lodderstedt</span>, <span class="refTitle">"The OAuth 2.1 Authorization Framework"</span>, <span class="refContent">Work in Progress</span>, <span class="seriesInfo">Internet-Draft, draft-ietf-oauth-v2-1-11</span>, <time datetime="2025-01-20" class="refDate">20 January 2025</time>, <span>&lt;<a href="https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1">https://datatracker.ietf.org/doc/html/draft-ietf-oauth-v2-1</a>&gt;</span>. </dd>
+<dd class="break"></dd>
 <dt id="RFC2119">[RFC2119]</dt>
         <dd>
-<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC6749">[RFC6749]</dt>
-        <dd>
-<span class="refAuthor">Hardt, D., Ed.</span>, <span class="refTitle">"The OAuth 2.0 Authorization Framework"</span>, <span class="seriesInfo">RFC 6749</span>, <span class="seriesInfo">DOI 10.17487/RFC6749</span>, <time datetime="2012-10" class="refDate">October 2012</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6749">https://www.rfc-editor.org/rfc/rfc6749</a>&gt;</span>. </dd>
+<span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc2119">https://www.rfc-editor.org/info/rfc2119</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC7636">[RFC7636]</dt>
         <dd>
-<span class="refAuthor">Sakimura, N., Ed.</span>, <span class="refAuthor">Bradley, J.</span>, and <span class="refAuthor">N. Agarwal</span>, <span class="refTitle">"Proof Key for Code Exchange by OAuth Public Clients"</span>, <span class="seriesInfo">RFC 7636</span>, <span class="seriesInfo">DOI 10.17487/RFC7636</span>, <time datetime="2015-09" class="refDate">September 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc7636">https://www.rfc-editor.org/rfc/rfc7636</a>&gt;</span>. </dd>
+<span class="refAuthor">Sakimura, N., Ed.</span>, <span class="refAuthor">Bradley, J.</span>, and <span class="refAuthor">N. Agarwal</span>, <span class="refTitle">"Proof Key for Code Exchange by OAuth Public Clients"</span>, <span class="seriesInfo">RFC 7636</span>, <span class="seriesInfo">DOI 10.17487/RFC7636</span>, <time datetime="2015-09" class="refDate">September 2015</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc7636">https://www.rfc-editor.org/info/rfc7636</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8174">[RFC8174]</dt>
         <dd>
-<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8174">https://www.rfc-editor.org/rfc/rfc8174</a>&gt;</span>. </dd>
+<span class="refAuthor">Leiba, B.</span>, <span class="refTitle">"Ambiguity of Uppercase vs Lowercase in RFC 2119 Key Words"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 8174</span>, <span class="seriesInfo">DOI 10.17487/RFC8174</span>, <time datetime="2017-05" class="refDate">May 2017</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8174">https://www.rfc-editor.org/info/rfc8174</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8705">[RFC8705]</dt>
       <dd>
-<span class="refAuthor">Campbell, B.</span>, <span class="refAuthor">Bradley, J.</span>, <span class="refAuthor">Sakimura, N.</span>, and <span class="refAuthor">T. Lodderstedt</span>, <span class="refTitle">"OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens"</span>, <span class="seriesInfo">RFC 8705</span>, <span class="seriesInfo">DOI 10.17487/RFC8705</span>, <time datetime="2020-02" class="refDate">February 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc8705">https://www.rfc-editor.org/rfc/rfc8705</a>&gt;</span>. </dd>
+<span class="refAuthor">Campbell, B.</span>, <span class="refAuthor">Bradley, J.</span>, <span class="refAuthor">Sakimura, N.</span>, and <span class="refAuthor">T. Lodderstedt</span>, <span class="refTitle">"OAuth 2.0 Mutual-TLS Client Authentication and Certificate-Bound Access Tokens"</span>, <span class="seriesInfo">RFC 8705</span>, <span class="seriesInfo">DOI 10.17487/RFC8705</span>, <time datetime="2020-02" class="refDate">February 2020</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc8705">https://www.rfc-editor.org/info/rfc8705</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
-</div>
-<div id="sec-informative-references">
 <section id="section-12.2">
         <h3 id="name-informative-references">
 <a href="#section-12.2" class="section-number selfRef">12.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
@@ -1497,23 +1725,24 @@ site_token = HMAC(person_key, client_id)
 <dl class="references">
 <dt id="RFC6819">[RFC6819]</dt>
         <dd>
-<span class="refAuthor">Lodderstedt, T., Ed.</span>, <span class="refAuthor">McGloin, M.</span>, and <span class="refAuthor">P. Hunt</span>, <span class="refTitle">"OAuth 2.0 Threat Model and Security Considerations"</span>, <span class="seriesInfo">RFC 6819</span>, <span class="seriesInfo">DOI 10.17487/RFC6819</span>, <time datetime="2013-01" class="refDate">January 2013</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6819">https://www.rfc-editor.org/rfc/rfc6819</a>&gt;</span>. </dd>
+<span class="refAuthor">Lodderstedt, T., Ed.</span>, <span class="refAuthor">McGloin, M.</span>, and <span class="refAuthor">P. Hunt</span>, <span class="refTitle">"OAuth 2.0 Threat Model and Security Considerations"</span>, <span class="seriesInfo">RFC 6819</span>, <span class="seriesInfo">DOI 10.17487/RFC6819</span>, <time datetime="2013-01" class="refDate">January 2013</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc6819">https://www.rfc-editor.org/info/rfc6819</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC9101">[RFC9101]</dt>
       <dd>
-<span class="refAuthor">Sakimura, N.</span>, <span class="refAuthor">Bradley, J.</span>, and <span class="refAuthor">M. Jones</span>, <span class="refTitle">"The OAuth 2.0 Authorization Framework: JWT-Secured Authorization Request (JAR)"</span>, <span class="seriesInfo">RFC 9101</span>, <span class="seriesInfo">DOI 10.17487/RFC9101</span>, <time datetime="2021-08" class="refDate">August 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc9101">https://www.rfc-editor.org/rfc/rfc9101</a>&gt;</span>. </dd>
+<span class="refAuthor">Sakimura, N.</span>, <span class="refAuthor">Bradley, J.</span>, and <span class="refAuthor">M. Jones</span>, <span class="refTitle">"The OAuth 2.0 Authorization Framework: JWT-Secured Authorization Request (JAR)"</span>, <span class="seriesInfo">RFC 9101</span>, <span class="seriesInfo">DOI 10.17487/RFC9101</span>, <time datetime="2021-08" class="refDate">August 2021</time>, <span>&lt;<a href="https://www.rfc-editor.org/info/rfc9101">https://www.rfc-editor.org/info/rfc9101</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 </dl>
 </section>
-</div>
 </section>
-</div>
 <div id="acknowledgments">
 <section id="appendix-A">
       <h2 id="name-acknowledgments">
 <a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
       </h2>
-<p id="appendix-A-1">The author would like to acknowledge ongoing discussions within the OAuth and digital privacy communities that informed the design principles of this specification.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<p id="appendix-A-1">
+                The author would like to acknowledge ongoing discussions within the
+                OAuth and digital privacy communities that informed the design
+                principles of this specification.<a href="#appendix-A-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="authors-addresses">
@@ -1524,9 +1753,14 @@ site_token = HMAC(person_key, client_id)
 <address class="vcard">
         <div dir="auto" class="left"><span class="fn nameRole">Francois-Xavier Morin</span></div>
 <div dir="auto" class="left"><span class="org">FXCO Ltd.</span></div>
+<div dir="auto" class="left"><span class="country-name">Canada</span></div>
 <div class="email">
 <span>Email:</span>
 <a href="mailto:fx@fxco.ca" class="email">fx@fxco.ca</a>
+</div>
+<div class="url">
+<span>URI:</span>
+<a href="https://fxco.ca/" class="url">https://fxco.ca/</a>
 </div>
 </address>
 </section>
